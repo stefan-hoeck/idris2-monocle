@@ -1,0 +1,18 @@
+package monocle
+version    = 0.0.1
+authors    = "stefan-hoeck"
+brief      = "A simple optics library"
+depends    = base    >= 0.6.0
+           , elab-util
+           , quantifiers-extra
+
+modules = Control.Lens
+        , Control.Lens.Fold
+        , Control.Lens.Getter
+        , Control.Lens.Iso
+        , Control.Lens.Optional
+        , Control.Lens.Prism
+        , Control.Lens.Setter
+        , Control.Lens.Traversal
+
+sourcedir  = "src"
