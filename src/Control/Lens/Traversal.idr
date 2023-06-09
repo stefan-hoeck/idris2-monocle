@@ -21,12 +21,12 @@ Traversal' s a = Traversal s s a a
 --------------------------------------------------------------------------------
 
 public export %inline
-toF : Traversal s t a b -> Fold s a
-toF t = F $ \f => runConst . t.modifyA (MkConst . f)
+F : Traversal s t a b -> Fold s a
+F t = F $ \f => runConst . t.modifyA (MkConst . f)
 
 public export %inline
-toS : Traversal s t a b -> Setter s t a b
-toS t = S $ \f => runIdentity . t.modifyA (Id . f)
+S : Traversal s t a b -> Setter s t a b
+S t = S $ \f => runIdentity . t.modifyA (Id . f)
 
 --------------------------------------------------------------------------------
 --          Utilities

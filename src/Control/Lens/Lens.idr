@@ -54,21 +54,24 @@ L g1 s1 >>> L g2 s2 = L (g2 . g1) (s1 . s2)
 --------------------------------------------------------------------------------
 
 public export %inline
-toG : Lens s t a b -> Getter s a
-toG = G . get
+G : Lens s t a b -> Getter s a
+G = G . get
 
 public export %inline
-toF : Lens s t a b -> Fold s a
-toF = toF . toG
+F : Lens s t a b -> Fold s a
+F = F . G
 
 public export
-toO : Lens s t a b -> Optional s t a b
-toO l = O (Right . l.get) (set l)
+O : Lens s t a b -> Optional s t a b
+O l = O (Right . l.get) (set l)
 
 public export %inline
-toT : Lens s t a b -> Traversal s t a b
-toT l = T (modF l)
+T : Lens s t a b -> Traversal s t a b
+T l = T (modF l)
 
+public export %inline
+S : Lens s t a b -> Setter s t a b
+S l = S l.mod
 
 --------------------------------------------------------------------------------
 --          Lenses

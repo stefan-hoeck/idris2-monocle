@@ -25,16 +25,16 @@ optional f g = O (\v => maybe (Left v) Right (f v)) g
 --------------------------------------------------------------------------------
 
 public export
-toS : Optional s t a b -> Setter s t a b
-toS (O g r) = S $ \f,vs => either id (\va => r (f va) vs) (g vs)
+S : Optional s t a b -> Setter s t a b
+S (O g r) = S $ \f,vs => either id (\va => r (f va) vs) (g vs)
 
 public export
-toF : Optional s t a b -> Fold s a
-toF (O g r) = F $ \f => either (const neutral) f . g
+F : Optional s t a b -> Fold s a
+F (O g r) = F $ \f => either (const neutral) f . g
 
 public export
-toT : Optional s t a b -> Traversal s t a b
-toT (O g r) = T $ \f,v => case g v of
+T : Optional s t a b -> Traversal s t a b
+T (O g r) = T $ \f,v => case g v of
   Left x  => pure x
   Right x => map (`r` v) (f x)
 

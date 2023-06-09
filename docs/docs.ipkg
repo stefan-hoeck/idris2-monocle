@@ -1,0 +1,8 @@
+package monocles-docs
+version    = 0.0.1
+authors    = "Stefan Höck"
+depends    = monocle
+
+modules    = Docs.Intro
+
+sourcedir  = "src"

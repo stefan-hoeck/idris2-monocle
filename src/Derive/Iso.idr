@@ -9,17 +9,17 @@ isoErr : Either String a
 isoErr = Left "Isomorphisms can only be derived for newtypes"
 
 parameters (o : LensOptions)
-  pname : Name -> Name
-  pname n = UN $ Basic (o.dataTypeName $ nameStr n)
+  iname : Name -> Name
+  iname n = UN $ Basic (o.dataTypeName $ nameStr n)
 
   iclaim : Visibility -> ParamTypeInfo -> Name -> TTImp -> Decl
   iclaim vis p con tpe =
     let arg := p.applied
-    in simpleClaim vis (pname con) `(Iso' ~(arg) ~(tpe))
+    in simpleClaim vis (iname con) `(Iso' ~(arg) ~(tpe))
 
   idef : Name -> Decl
   idef con =
-    let nme := pname con
+    let nme := iname con
         get := `(\case ~(var con) x => x)
      in def nme [patClause (var nme) `(I ~(get) ~(var con))]
 
