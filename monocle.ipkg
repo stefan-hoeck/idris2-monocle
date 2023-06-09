@@ -15,4 +15,9 @@ modules = Control.Lens
         , Control.Lens.Setter
         , Control.Lens.Traversal
 
+        , Derive.Iso
+        , Derive.Lens
+        , Derive.Lens.Options
+        , Derive.Prism
+
 sourcedir  = "src"
