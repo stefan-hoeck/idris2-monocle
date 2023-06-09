@@ -17,6 +17,7 @@ modules = Control.Lens
 
         , Derive.Iso
         , Derive.Lens
+        , Derive.Lens.Options
         , Derive.Prism
 
 sourcedir  = "src"
