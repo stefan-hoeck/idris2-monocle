@@ -2,7 +2,9 @@ package monocles-docs
 version    = 0.0.1
 authors    = "Stefan Höck"
 depends    = monocle
+           , json-simple
 
 modules    = Docs.Intro
+           , Docs.README
 
 sourcedir  = "src"

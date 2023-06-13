@@ -15,6 +15,8 @@ import Derive.Lens
 import Derive.Prelude
 import Derive.Prism
 
+import JSON.Simple.Derive
+
 %default total
 %language ElabReflection
 ```
@@ -38,7 +40,7 @@ record Address where
   city   : String
   state  : String
 
-%runElab derive "Address" [Show,Eq]
+%runElab derive "Address" [Show,Eq,FromJSON,ToJSON]
 
 streetL : Lens' Address String
 streetL = lens street $ \x => {street := x}
@@ -100,7 +102,7 @@ record Employee where
   address    : Address
   supervisor : Maybe Employee
 
-%runElab derive "Employee" [Lenses,Show,Eq]
+%runElab derive "Employee" [Lenses,Show,Eq,FromJSON,ToJSON]
 ```
 
 The last line includes an instruction to derive the lenses of `Empoyee`
@@ -169,7 +171,7 @@ record Age where
   constructor MkAge
   value : Nat
 
-%runElab derive "Age" [Show,Eq,FromInteger]
+%runElab derive "Age" [Show,Eq,FromInteger,FromJSON,ToJSON]
 
 age : Iso' Age Nat
 age = I value MkAge
@@ -182,7 +184,7 @@ record UserName where
   constructor MkUserName
   value : String
 
-%runElab derive "UserName" [Iso,Show,Eq,FromString]
+%runElab derive "UserName" [Iso,Show,Eq,FromString,FromJSON,ToJSON]
 ```
 
 And here's how to make use of them in combination with record updates:
@@ -195,7 +197,7 @@ namespace User
     name : Intro.UserName
     age  : Age
 
-  %runElab derive "User" [Lenses, Show, Eq]
+  %runElab derive "User" [Lenses, Show, Eq,FromJSON,ToJSON]
 
 stefan : User
 stefan = MkUser "Stefan" 44
@@ -254,6 +256,75 @@ A `Prism` consists of two functions (which can be passed to the
 to extract a wrapped value and an injection function which
 wraps a value in the correct data constructor.
 
+Besides sum types, there are many situations where a `Prism` is
+appropriate. For instance:
+
+```idris
+json : FromJSON a => ToJSON a => Prism' JSON a
+json = prism (either (const Nothing) Just . fromJSON) toJSON
+
+parseJSON : Prism' String JSON
+parseJSON = prism (either (const Nothing) Just . parseJSON Virtual) show
+
+codec : FromJSON a => ToJSON a => Prism' String a
+codec = parseJSON >>> json
+```
+
+Let's give this a go:
+
+```idris
+incEncodedAge : String -> String
+incEncodedAge = mod (S codec >>> S Intro.ageL) (+1)
+
+encodedEmployee : String
+encodedEmployee = """
+  {
+    "name"       : "John",
+    "age"        : 33,
+    "salary"     : 5300,
+    "supervisor" : null,
+    "address"    : {
+      "street" : "Here" ,
+      "number" : 123,
+      "city"   : "London",
+      "state"  : "GB"
+    }
+  }
+  """
+```
+
+Go ahead, and give this a try at the REPL: `incEncodedAge encodedEmployee` will
+increase the encoded employee's age and return a new string with the JSON data.
+
+## Optional: A View on Things that might not be there
+
+There are only a few views left for us to cover, but this one is also highly
+useful. Assume we got a list of employees and would like to increase the
+salary of all whose age is above 40. Here's how to do that:
+
+```idris
+increased : List Employee
+increased =
+  mod (map_ >>> S (filter $ (> 40) . age) >>> S salaryL) (+100) [helen,john]
+```
+
+In the example above, Helen's salary will be increased while John's won't.
+Setter `map_` operates on all values in a functor, while `filter` defines
+an `Optional` that only returns or updates a value if it fulfills the
+given predicate.
+
+`Optional`s are slightly less powerful than `Prism`s (every `Prism`
+can be converted to an `Optional` by means of the `O` utility function).
+
+Note: The `filter` `Optional` we used above is somewhat controversial, as
+it allows us to define non-lawful optics. I'll cover this topic in
+a later section, but suffice to say that we should not filter on
+a piece of information we plan to modify with the same optic. In the
+example above, we are fine: We filter on age but we modify the salary.
+
+## Traversal: An Optic for effectful Traversals
+
+To be done....
 
 <!-- vi: filetype=idris2:syntax=markdown
 -->
