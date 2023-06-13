@@ -13,9 +13,10 @@ parameters (o : LensOptions)
   iname n = UN $ Basic (o.dataTypeName $ nameStr n)
 
   iclaim : Visibility -> ParamTypeInfo -> Name -> TTImp -> Decl
-  iclaim vis p con tpe =
+  iclaim vis p con rtpe =
     let arg := p.applied
-    in simpleClaim vis (iname con) `(Iso' ~(arg) ~(tpe))
+        tpe := piAll `(Iso' ~(arg) ~(rtpe)) p.implicits
+    in simpleClaim vis (iname con) tpe
 
   idef : Name -> Decl
   idef con =
