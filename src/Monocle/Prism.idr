@@ -1,9 +1,9 @@
-module Control.Lens.Prism
+module Monocle.Prism
 
-import Control.Lens.Fold
-import Control.Lens.Optional
-import Control.Lens.Setter
-import Control.Lens.Traversal
+import Monocle.Fold
+import Monocle.Optional
+import Monocle.Setter
+import Monocle.Traversal
 import Data.List.Quantifiers.Extra
 
 %default total

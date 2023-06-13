@@ -1,10 +1,10 @@
-module Control.Lens.Lens
+module Monocle.Lens
 
-import Control.Lens.Fold
-import Control.Lens.Getter
-import Control.Lens.Optional
-import Control.Lens.Setter
-import Control.Lens.Traversal
+import Monocle.Fold
+import Monocle.Getter
+import Monocle.Optional
+import Monocle.Setter
+import Monocle.Traversal
 import Data.List.Quantifiers.Extra
 import Data.List1
 import Data.Maybe

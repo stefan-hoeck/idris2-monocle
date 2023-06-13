@@ -1,6 +1,6 @@
-module Control.Lens.Setter
+module Monocle.Setter
 
-import Control.Lens.Fold
+import Monocle.Fold
 import Data.Contravariant
 import Data.SnocList
 

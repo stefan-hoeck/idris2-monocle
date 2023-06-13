@@ -1,4 +1,4 @@
-module Control.Lens.Fold
+module Monocle.Fold
 
 import Data.List
 import Data.SnocList

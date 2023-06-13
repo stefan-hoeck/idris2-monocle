@@ -8,7 +8,7 @@ the necessary imports.
 ```idris
 module Docs.Intro
 
-import Control.Lens
+import Monocle
 
 import Derive.Iso
 import Derive.Lens

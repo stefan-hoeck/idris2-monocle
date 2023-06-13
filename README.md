@@ -18,7 +18,7 @@ in a - possibly deeply - nested data structure.
 ```idris
 module Docs.README
 
-import Control.Lens
+import Monocle
 import Derive.Lens
 import Derive.Prelude
 
