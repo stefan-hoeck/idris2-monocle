@@ -10,6 +10,7 @@ modules = Control.Lens
         , Control.Lens.Fold
         , Control.Lens.Getter
         , Control.Lens.Iso
+        , Control.Lens.Lens
         , Control.Lens.Optional
         , Control.Lens.Prism
         , Control.Lens.Setter

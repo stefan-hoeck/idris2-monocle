@@ -27,28 +27,28 @@ Iso' s a = Iso s s a a
 --------------------------------------------------------------------------------
 
 public export
-toO : Iso s t a b -> Optional s t a b
-toO (I g r) = O (Right . g) (const . r)
+O : Iso s t a b -> Optional s t a b
+O (I g r) = O (Right . g) (const . r)
 
 public export
-toS : Iso s t a b -> Setter s t a b
-toS (I g r) = S $ \f => r . f . g
+S : Iso s t a b -> Setter s t a b
+S (I g r) = S $ \f => r . f . g
 
 public export %inline
-toF : Iso s t a b -> Fold s a
-toF (I g r) = F (. g)
+F : Iso s t a b -> Fold s a
+F (I g r) = F (. g)
 
 public export
-toG : Iso s t a b -> Getter s a
-toG (I g r) = G g
+G : Iso s t a b -> Getter s a
+G (I g r) = G g
 
 public export
-toT : Iso s t a b -> Traversal s t a b
-toT (I g r) = T $ \f,v => r <$> f (g v)
+T : Iso s t a b -> Traversal s t a b
+T (I g r) = T $ \f,v => r <$> f (g v)
 
 public export %inline
-toL : Iso s t a b -> Lens s t a b
-toL (I g r) = L g $ \f => r . f . g
+L : Iso s t a b -> Lens s t a b
+L (I g r) = L g $ \f => r . f . g
 
 --------------------------------------------------------------------------------
 --          Utilitis
@@ -61,6 +61,10 @@ rev (I f g) = I g f
 public export
 (>>>) : Iso s t a b -> Iso a b c d -> Iso s t c d
 I f1 g1 >>> I f2 g2 = I (f2 . f1) (g1 . g2)
+
+public export %inline
+mod : Iso s t a b -> (a -> b) -> s -> t
+mod (I g h) f = h . f . g
 
 --------------------------------------------------------------------------------
 --          Isomorphisms

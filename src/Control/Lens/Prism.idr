@@ -27,20 +27,20 @@ prism f = P (\v => maybe (Left v) Right (f v))
 --------------------------------------------------------------------------------
 
 public export
-toO : Prism s t a b -> Optional s t a b
-toO (P g r) = O g (const . r)
+O : Prism s t a b -> Optional s t a b
+O (P g r) = O g (const . r)
 
 public export
-toS : Prism s t a b -> Setter s t a b
-toS (P g r) = S $ \f,vs => either id (r . f) (g vs)
+S : Prism s t a b -> Setter s t a b
+S (P g r) = S $ \f,vs => either id (r . f) (g vs)
 
 public export
-toF : Prism s t a b -> Fold s a
-toF (P g r) = F $ \f => either (const neutral) f . g
+F : Prism s t a b -> Fold s a
+F (P g r) = F $ \f => either (const neutral) f . g
 
 public export
-toT : Prism s t a b -> Traversal s t a b
-toT (P g r) = T $ \f,v => case g v of
+T : Prism s t a b -> Traversal s t a b
+T (P g r) = T $ \f,v => case g v of
   Left x  => pure x
   Right x => r <$> f x
 
@@ -59,28 +59,48 @@ P g1 r1 >>> P g2 r2 =
 --------------------------------------------------------------------------------
 
 public export
-left : Prism (Either a b) (Either c b) a c
-left = P (either Right (Left . Right)) Left
+left' : Prism (Either a b) (Either c b) a c
+left' = P (either Right (Left . Right)) Left
+
+public export %inline
+left : Prism' (Either a b) a
+left = left'
 
 public export
-right : Prism (Either a b) (Either a c) b c
-right = P (either (Left . Left) Right) Right
+right' : Prism (Either a b) (Either a c) b c
+right' = P (either (Left . Left) Right) Right
+
+public export %inline
+right : Prism' (Either a b) b
+right = right'
 
 public export
-just : Prism (Maybe a) (Maybe b) a b
-just = P (maybe (Left Nothing) Right) Just
+just' : Prism (Maybe a) (Maybe b) a b
+just' = P (maybe (Left Nothing) Right) Just
+
+public export %inline
+just : Prism' (Maybe a) a
+just = just'
 
 public export
 nothing : Prism' (Maybe a) ()
 nothing = P (maybe (Right ()) (Left . Just)) (const Nothing)
 
 public export
-cons : Prism (List a) (List b) (a,List a) (b,List b)
-cons = P (\case Nil => Left Nil; h::t => Right (h,t)) (uncurry (::))
+cons' : Prism (List a) (List b) (a,List a) (b,List b)
+cons' = P (\case Nil => Left Nil; h::t => Right (h,t)) (uncurry (::))
+
+public export %inline
+cons : Prism' (List a) (a,List a)
+cons = cons'
 
 public export
-snoc : Prism (SnocList a) (SnocList b) (SnocList a,a) (SnocList b,b)
-snoc = P (\case Lin => Left Lin; i :< l => Right (i,l)) (uncurry (:<))
+snoc' : Prism (SnocList a) (SnocList b) (SnocList a,a) (SnocList b,b)
+snoc' = P (\case Lin => Left Lin; i :< l => Right (i,l)) (uncurry (:<))
+
+public export %inline
+snoc : Prism' (SnocList a) (SnocList a,a)
+snoc = snoc'
 
 public export
 sum :

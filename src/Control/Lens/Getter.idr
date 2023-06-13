@@ -26,5 +26,5 @@ find f p v = let x := f.get v in if p x then Just x else Nothing
 --------------------------------------------------------------------------------
 
 public export %inline
-toF : Getter s a -> Fold s a
-toF f = F (. get f)
+F : Getter s a -> Fold s a
+F f = F (. get f)
