@@ -1,6 +1,6 @@
-module Control.Lens.Getter
+module Monocle.Getter
 
-import Control.Lens.Fold
+import Monocle.Fold
 
 %default total
 

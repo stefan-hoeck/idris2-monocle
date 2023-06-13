@@ -1,8 +1,8 @@
-module Control.Lens.Optional
+module Monocle.Optional
 
-import Control.Lens.Fold
-import Control.Lens.Setter
-import Control.Lens.Traversal
+import Monocle.Fold
+import Monocle.Setter
+import Monocle.Traversal
 
 %default total
 

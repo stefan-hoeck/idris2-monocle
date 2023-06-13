@@ -1,13 +1,13 @@
-module Control.Lens.Compose
+module Monocle.Compose
 
-import Control.Lens.Fold
-import Control.Lens.Getter
-import Control.Lens.Iso
-import Control.Lens.Lens
-import Control.Lens.Optional
-import Control.Lens.Prism
-import Control.Lens.Setter
-import Control.Lens.Traversal
+import Monocle.Fold
+import Monocle.Getter
+import Monocle.Iso
+import Monocle.Lens
+import Monocle.Optional
+import Monocle.Prism
+import Monocle.Setter
+import Monocle.Traversal
 
 %default total
 

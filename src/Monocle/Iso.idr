@@ -1,12 +1,12 @@
-module Control.Lens.Iso
+module Monocle.Iso
 
-import Control.Lens.Fold
-import Control.Lens.Getter
-import Control.Lens.Lens
-import Control.Lens.Optional
-import Control.Lens.Prism
-import Control.Lens.Setter
-import Control.Lens.Traversal
+import Monocle.Fold
+import Monocle.Getter
+import Monocle.Lens
+import Monocle.Optional
+import Monocle.Prism
+import Monocle.Setter
+import Monocle.Traversal
 import Data.List.Quantifiers
 import Data.Maybe
 

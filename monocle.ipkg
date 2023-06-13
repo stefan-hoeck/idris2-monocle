@@ -6,16 +6,16 @@ depends    = base    >= 0.6.0
            , elab-util
            , quantifiers-extra
 
-modules = Control.Lens
-        , Control.Lens.Compose
-        , Control.Lens.Fold
-        , Control.Lens.Getter
-        , Control.Lens.Iso
-        , Control.Lens.Lens
-        , Control.Lens.Optional
-        , Control.Lens.Prism
-        , Control.Lens.Setter
-        , Control.Lens.Traversal
+modules = Monocle
+        , Monocle.Compose
+        , Monocle.Fold
+        , Monocle.Getter
+        , Monocle.Iso
+        , Monocle.Lens
+        , Monocle.Optional
+        , Monocle.Prism
+        , Monocle.Setter
+        , Monocle.Traversal
 
         , Derive.Iso
         , Derive.Lens

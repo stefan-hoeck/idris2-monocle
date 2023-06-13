@@ -1,9 +1,9 @@
-module Control.Lens.Traversal
+module Monocle.Traversal
 
 import Control.Applicative.Const
-import Control.Lens.Fold
-import Control.Lens.Setter
 import Control.Monad.Identity
+import Monocle.Fold
+import Monocle.Setter
 
 %default total
 
