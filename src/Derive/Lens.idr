@@ -12,7 +12,8 @@ parameters (o : LensOptions)
   lclaim : Visibility -> ParamTypeInfo -> BoundArg 0 RegularNamed -> Decl
   lclaim vis p (BA x _ _) =
     let arg := p.applied
-     in simpleClaim vis (lname $ argName x) `(Lens' ~(arg) ~(x.type))
+        tpe := piAll `(Lens' ~(arg) ~(x.type)) p.implicits
+     in simpleClaim vis (lname $ argName x) tpe
 
   ldef : BoundArg 0 RegularNamed -> Decl
   ldef (BA x _ _) =
