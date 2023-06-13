@@ -67,13 +67,13 @@ address : Address
 address = A "Krümelweg" 12 "Bronschofen" "CH"
 
 kruemelweg : String
-kruemelweg = get streetL address
+kruemelweg = to streetL address
 
 moveToGermany : Address
 moveToGermany = set stateL "DE" address
 
 increaseNumber : Address
-increaseNumber = mod numberL (+2) address
+increaseNumber = over numberL (+2) address
 ```
 
 As you can see, we can access and update the values in a record
@@ -124,7 +124,7 @@ letters. Let's fix this:
 
 ```idris
 johnFixed :  Employee
-johnFixed = mod (addressL >>> stateL) toUpper john
+johnFixed = over (addressL .> stateL) toUpper john
 ```
 
 As you can see, lenses can be composed via the `(>>>)` operator.
@@ -149,7 +149,7 @@ lastUp (i :< l) = i :< toUpper l
 lastUp [<]      = [<]
 
 lastToUpper : String -> String
-lastToUpper = mod (unpack >>> fish) lastUp
+lastToUpper = over (unpack .> fish) lastUp
 ```
 
 Again, this is nothing spectacular, as we could to the same
@@ -160,7 +160,7 @@ the nested records we defined in the first section:
 
 ```idris
 zuericH : Employee
-zuericH = mod (addressL >>> cityL >>> L unpack >>> L fish) lastUp john
+zuericH = over (addressL .> cityL .> unpack .> fish) lastUp john
 ```
 
 Isomorphisms arise naturally from lossless conversions, for
@@ -173,8 +173,8 @@ record Age where
 
 %runElab derive "Age" [Show,Eq,FromInteger,FromJSON,ToJSON]
 
-age : Iso' Age Nat
-age = I value MkAge
+ageI : Iso' Age Nat
+ageI = I value MkAge
 ```
 
 Again, we can derive these simple isomorphisms automatically:
@@ -203,7 +203,7 @@ stefan : User
 stefan = MkUser "Stefan" 44
 
 olderStefan : User
-olderStefan = mod (ageL >>> L age) (+3) stefan
+olderStefan = over (User.ageL .> ageI) (+3) stefan
 ```
 
 ## Folds and Setters: Core Optics
@@ -218,8 +218,7 @@ Here's an example: Get the third letter of the name of an employee's supervisor
 
 ```idris
 thirdLetter : Employee -> Maybe Char
-thirdLetter =
-  first (F supervisorL >>> F just >>> F nameL >>> F unpack >>> F (index 2))
+thirdLetter = first (supervisorL .> just .> nameL .> unpack .> ix 2)
 ```
 
 `Fold`s are the most basic way of accessing data, and fortunately, all
@@ -236,8 +235,7 @@ given letter with another one:
 
 ```idris
 thirdBang : Employee -> Employee
-thirdBang =
-  set (S supervisorL >>> S just >>> S nameL >>> S unpack >>> S (index 2)) '!'
+thirdBang = set (supervisorL .> just .> nameL .> unpack .> ix 2) '!'
 ```
 
 All optics with the exception of `Fold`s and `Getter`s can be converted
@@ -267,14 +265,14 @@ parseJSON : Prism' String JSON
 parseJSON = prism (either (const Nothing) Just . parseJSON Virtual) show
 
 codec : FromJSON a => ToJSON a => Prism' String a
-codec = parseJSON >>> json
+codec = parseJSON .> json
 ```
 
 Let's give this a go:
 
 ```idris
 incEncodedAge : String -> String
-incEncodedAge = mod (S codec >>> S Intro.ageL) (+1)
+incEncodedAge = over (codec .> Intro.ageL) (+1)
 
 encodedEmployee : String
 encodedEmployee = """
@@ -304,8 +302,7 @@ salary of all whose age is above 40. Here's how to do that:
 
 ```idris
 increased : List Employee
-increased =
-  mod (map_ >>> S (filter $ (> 40) . age) >>> S salaryL) (+100) [helen,john]
+increased = over (map_ .> select ((> 40) . age) .> salaryL) (+100) [helen,john]
 ```
 
 In the example above, Helen's salary will be increased while John's won't.

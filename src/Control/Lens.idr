@@ -1,5 +1,6 @@
 module Control.Lens
 
+import public Control.Lens.Compose
 import public Control.Lens.Fold
 import public Control.Lens.Getter
 import public Control.Lens.Iso

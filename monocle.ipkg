@@ -7,6 +7,7 @@ depends    = base    >= 0.6.0
            , quantifiers-extra
 
 modules = Control.Lens
+        , Control.Lens.Compose
         , Control.Lens.Fold
         , Control.Lens.Getter
         , Control.Lens.Iso

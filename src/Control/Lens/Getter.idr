@@ -5,26 +5,32 @@ import Control.Lens.Fold
 %default total
 
 public export
-record Getter s a where
+record Getter (s,t,a,b : Type) where
   constructor G
-  get : s -> a
+  to_ : s -> a
 
 public export %inline
-(>>>) : Getter s a -> Getter a b -> Getter s b
-G f >>> G g = G $ g . f
-
+(|>) : Getter s t a b -> Getter a b c d -> Getter s t c d
+G f |> G g = G $ g . f
 --------------------------------------------------------------------------------
---          Utilities
+--          Interface
 --------------------------------------------------------------------------------
 
 public export
-find : Getter s a -> (a -> Bool) -> s -> Maybe a
-find f p v = let x := f.get v in if p x then Just x else Nothing
+interface ToGetter (0 o : Type -> Type -> Type -> Type -> Type) where
+  toGetter : o s t a b -> Getter s t a b
+
+public export %inline
+ToGetter Getter where toGetter = id
+
+public export %inline
+to : ToGetter o => o s t a b -> s -> a
+to = to_ . toGetter
 
 --------------------------------------------------------------------------------
 --          Conversions
 --------------------------------------------------------------------------------
 
 public export %inline
-F : Getter s a -> Fold s a
-F f = F (. get f)
+ToFold Getter where
+  toFold f = F (. to_ f)

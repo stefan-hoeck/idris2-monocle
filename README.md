@@ -49,8 +49,7 @@ the state of all employees living in Zurich to `"CH"`:
 
 ```idris
 adjState : List Employee -> List Employee
-adjState =
-  set (map_ >>> S addressL >>> S (filter ((== "Zürich") . city)) >>> S stateL) "CH"
+adjState = set (map_ .> addressL .> eqBy "Zürich" city .> stateL) "CH"
 ```
 
 The example above makes use of several optics: `map_` is a `Setter` working
