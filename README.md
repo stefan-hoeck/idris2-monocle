@@ -65,10 +65,11 @@ of optics is not automatic. This makes the code above slightly less elegant
 
 ## Design Decisions
 
-
 There is already at least one other optics library
-([idris2-lens](link to lens)) and I expect there might follow additional
+([idris2-lens](https://github.com/kiana-S/idris2-lens)) and there might follow additional
 libraries because the design space for implementing optics is pretty large.
+
+To be continued...
 
 <!-- vi: filetype=idris2:syntax=markdown
 -->
