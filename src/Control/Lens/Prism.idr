@@ -23,34 +23,45 @@ prism : (a -> Maybe b) -> (b -> a) -> Prism' a b
 prism f = P (\v => maybe (Left v) Right (f v))
 
 --------------------------------------------------------------------------------
+--          Interface
+--------------------------------------------------------------------------------
+
+public export
+interface ToPrism (0 o : Type -> Type -> Type -> Type -> Type) where
+  toPrism : o s t a b -> Prism s t a b
+
+public export %inline
+ToPrism Prism where toPrism = id
+
+--------------------------------------------------------------------------------
 --          Conversions
 --------------------------------------------------------------------------------
 
 public export
-O : Prism s t a b -> Optional s t a b
-O (P g r) = O g (const . r)
+ToOptional Prism where
+  toOptional (P g r) = O g (const . r)
 
 public export
-S : Prism s t a b -> Setter s t a b
-S (P g r) = S $ \f,vs => either id (r . f) (g vs)
+ToSetter Prism where
+  toSetter (P g r) = S $ \f,vs => either id (r . f) (g vs)
 
 public export
-F : Prism s t a b -> Fold s a
-F (P g r) = F $ \f => either (const neutral) f . g
+ToFold Prism where
+  toFold (P g r) = F $ \f => either (const neutral) f . g
 
 public export
-T : Prism s t a b -> Traversal s t a b
-T (P g r) = T $ \f,v => case g v of
-  Left x  => pure x
-  Right x => r <$> f x
+ToTraversal Prism where
+  toTraversal (P g r) = T $ \f,v => case g v of
+    Left x  => pure x
+    Right x => r <$> f x
 
 --------------------------------------------------------------------------------
 --          Utilities
 --------------------------------------------------------------------------------
 
 public export
-(>>>) : Prism s t a b -> Prism a b c d -> Prism s t c d
-P g1 r1 >>> P g2 r2 =
+(|>) : Prism s t a b -> Prism a b c d -> Prism s t c d
+P g1 r1 |> P g2 r2 =
   P (\v => g1 v >>= mapFst r1 . g2)
     (r1 . r2)
 

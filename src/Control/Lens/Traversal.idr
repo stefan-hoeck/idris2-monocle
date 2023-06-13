@@ -17,24 +17,35 @@ public export
 Traversal' s a = Traversal s s a a
 
 --------------------------------------------------------------------------------
+--          Interface
+--------------------------------------------------------------------------------
+
+public export
+interface ToTraversal (0 o : Type -> Type -> Type -> Type -> Type) where
+  toTraversal : o s t a b -> Traversal s t a b
+
+public export %inline
+ToTraversal Traversal where toTraversal = id
+
+--------------------------------------------------------------------------------
 --          Conversions
 --------------------------------------------------------------------------------
 
 public export %inline
-F : Traversal s t a b -> Fold s a
-F t = F $ \f => runConst . t.modifyA (MkConst . f)
+ToFold Traversal where
+  toFold t = F $ \f => runConst . t.modifyA (MkConst . f)
 
 public export %inline
-S : Traversal s t a b -> Setter s t a b
-S t = S $ \f => runIdentity . t.modifyA (Id . f)
+ToSetter Traversal where
+  toSetter t = S $ \f => runIdentity . t.modifyA (Id . f)
 
 --------------------------------------------------------------------------------
 --          Utilities
 --------------------------------------------------------------------------------
 
 public export %inline
-(>>>) : Traversal s t a b -> Traversal a b c d -> Traversal s t c d
-T f >>> T g = T $ f . g
+(|>) : Traversal s t a b -> Traversal a b c d -> Traversal s t c d
+T f |> T g = T $ f . g
 
 --------------------------------------------------------------------------------
 --          Predefined Traversals

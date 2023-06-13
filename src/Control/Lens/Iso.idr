@@ -15,7 +15,7 @@ import Data.Maybe
 public export
 record Iso s t a b where
   constructor I
-  get        : s -> a
+  get_       : s -> a
   reverseGet : b -> t
 
 public export
@@ -23,32 +23,47 @@ public export
 Iso' s a = Iso s s a a
 
 --------------------------------------------------------------------------------
+--          Interface
+--------------------------------------------------------------------------------
+
+public export
+interface ToIso (0 o : Type -> Type -> Type -> Type -> Type) where
+  toIso : o s t a b -> Iso s t a b
+
+public export %inline
+ToIso Iso where toIso = id
+
+--------------------------------------------------------------------------------
 --          Conversions
 --------------------------------------------------------------------------------
 
 public export
-O : Iso s t a b -> Optional s t a b
-O (I g r) = O (Right . g) (const . r)
+ToPrism Iso where
+  toPrism (I g r) = P (Right . g) r
 
 public export
-S : Iso s t a b -> Setter s t a b
-S (I g r) = S $ \f => r . f . g
+ToOptional Iso where
+  toOptional (I g r) = O (Right . g) (const . r)
+
+public export
+ToSetter Iso where
+  toSetter (I g r) = S $ \f => r . f . g
 
 public export %inline
-F : Iso s t a b -> Fold s a
-F (I g r) = F (. g)
+ToFold Iso where
+  toFold (I g r) = F (. g)
 
 public export
-G : Iso s t a b -> Getter s a
-G (I g r) = G g
+ToGetter Iso where
+  toGetter (I g r) = G g
 
 public export
-T : Iso s t a b -> Traversal s t a b
-T (I g r) = T $ \f,v => r <$> f (g v)
+ToTraversal Iso where
+  toTraversal (I g r) = T $ \f,v => r <$> f (g v)
 
 public export %inline
-L : Iso s t a b -> Lens s t a b
-L (I g r) = L g $ \f => r . f . g
+ToLens Iso where
+  toLens (I g r) = L g $ \f => r . f . g
 
 --------------------------------------------------------------------------------
 --          Utilitis
@@ -59,12 +74,8 @@ rev : Iso s t a b -> Iso b a t s
 rev (I f g) = I g f
 
 public export
-(>>>) : Iso s t a b -> Iso a b c d -> Iso s t c d
-I f1 g1 >>> I f2 g2 = I (f2 . f1) (g1 . g2)
-
-public export %inline
-mod : Iso s t a b -> (a -> b) -> s -> t
-mod (I g h) f = h . f . g
+(|>) : Iso s t a b -> Iso a b c d -> Iso s t c d
+I f1 g1 |> I f2 g2 = I (f2 . f1) (g1 . g2)
 
 --------------------------------------------------------------------------------
 --          Isomorphisms

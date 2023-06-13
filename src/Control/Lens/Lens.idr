@@ -13,7 +13,7 @@ import Data.Vect
 
 %default total
 
-infixr 1 >>>
+infixl 9 |>
 
 --------------------------------------------------------------------------------
 --          Lens
@@ -22,8 +22,8 @@ infixr 1 >>>
 public export
 record Lens (s,t,a,b : Type) where
   constructor L
-  get : s -> a
-  mod : (a -> b) -> s -> t
+  get_ : s -> a
+  mod_ : (a -> b) -> s -> t
 
 public export
 0 Lens' : (s,a : Type) -> Type
@@ -34,44 +34,55 @@ lens : (s -> a) -> (b -> s -> t) -> Lens s t a b
 lens f g = L f $ \h,v => g (h $ f v) v
 
 --------------------------------------------------------------------------------
+--          Interface
+--------------------------------------------------------------------------------
+
+public export
+interface ToLens (0 o : Type -> Type -> Type -> Type -> Type) where
+  toLens : o s t a b -> Lens s t a b
+
+public export %inline
+ToLens Lens where toLens = id
+
+--------------------------------------------------------------------------------
 --          Utilities
 --------------------------------------------------------------------------------
 
 public export %inline
-set : Lens s t a b -> b -> s -> t
-set l = mod l . const
+setL : Lens s t a b -> b -> s -> t
+setL l = mod_ l . const
 
 public export %inline
 modF : Functor f => Lens s t a b -> (a -> f b) -> s -> f t
-modF l g v = (\x => set l x v) <$> g (get l v)
+modF l g v = (\x => setL l x v) <$> g (get_ l v)
 
 public export
-(>>>) : Lens s t x y -> Lens x y a b -> Lens s t a b
-L g1 s1 >>> L g2 s2 = L (g2 . g1) (s1 . s2)
+(|>) : Lens s t x y -> Lens x y a b -> Lens s t a b
+L g1 s1 |> L g2 s2 = L (g2 . g1) (s1 . s2)
 
 --------------------------------------------------------------------------------
 --          Conversions
 --------------------------------------------------------------------------------
 
 public export %inline
-G : Lens s t a b -> Getter s a
-G = G . get
+ToGetter Lens where
+  toGetter  = G . get_
 
 public export %inline
-F : Lens s t a b -> Fold s a
-F = F . G
+ToFold Lens where
+  toFold = toFold . toGetter
 
 public export
-O : Lens s t a b -> Optional s t a b
-O l = O (Right . l.get) (set l)
+ToOptional Lens where
+  toOptional l = O (Right . l.get_) (setL l)
 
 public export %inline
-T : Lens s t a b -> Traversal s t a b
-T l = T (modF l)
+ToTraversal Lens where
+  toTraversal l = T (modF l)
 
 public export %inline
-S : Lens s t a b -> Setter s t a b
-S l = S l.mod
+ToSetter Lens where
+  toSetter = S . mod_
 
 --------------------------------------------------------------------------------
 --          Lenses

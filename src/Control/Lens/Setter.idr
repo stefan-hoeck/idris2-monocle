@@ -9,23 +9,38 @@ import Data.SnocList
 public export
 record Setter s t a b where
   constructor S
-  mod : (a -> b) -> s -> t
+  over_ : (a -> b) -> s -> t
 
 public export
 0 Setter' : (s,a : Type) -> Type
 Setter' s a = Setter s s a a
 
 --------------------------------------------------------------------------------
+--          Interface
+--------------------------------------------------------------------------------
+
+public export
+interface ToSetter (0 o : Type -> Type -> Type -> Type -> Type) where
+  toSetter : o s t a b -> Setter s t a b
+
+public export %inline
+ToSetter Setter where toSetter = id
+
+--------------------------------------------------------------------------------
 --          Utilities
 --------------------------------------------------------------------------------
 
 public export %inline
-set : Setter s t a b -> b -> s -> t
-set f = f.mod . const
+over : ToSetter o => o s t a b -> (a -> b) -> s -> t
+over f = over_ (toSetter f)
 
 public export %inline
-(>>>) : Setter s t a b -> Setter a b c d -> Setter s t c d
-S f >>> S g = S $ f . g
+set : ToSetter o => o s t a b -> b -> s -> t
+set f = over (toSetter f) . const
+
+public export %inline
+(|>) : Setter s t a b -> Setter a b c d -> Setter s t c d
+S f |> S g = S $ f . g
 
 --------------------------------------------------------------------------------
 --          Predefined Setters
