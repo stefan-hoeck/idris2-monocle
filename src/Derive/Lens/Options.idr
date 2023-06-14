@@ -19,4 +19,4 @@ toLowerHead s = case strM s of
 
 export
 defaultOptions : LensOptions
-defaultOptions = LO (++ "L") toLowerHead toLowerHead
+defaultOptions = LO (++ "L") toLowerHead (\x => toLowerHead x ++ "I")

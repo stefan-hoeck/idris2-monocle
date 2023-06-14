@@ -49,18 +49,14 @@ the state of all employees living in Zurich to `"CH"`:
 
 ```idris
 adjState : List Employee -> List Employee
-adjState = set (map_ .> addressL .> eqBy "Zürich" city .> stateL) "CH"
+adjState = set (list_ .> addressL .> eqBy "Zürich" city .> stateL) "CH"
 ```
 
-The example above makes use of several optics: `map_` is a `Setter` working
-on all `Functor`s by mapping over the values they contain, `addressL` is a `Lens`
-auto-generated for data type `Employee`, `filter` is an `Optional`, and
-`stateL` is another `Lens`. All of these are converted to `Setter`s by using the
-`S` utility (resolved by ambiguity resolution) and composed using
-the `(>>>)` operator.
-
-Unlike with other optics libraries, interconversion between different types
-of optics is not automatic. This makes the code above slightly less elegant
+The example above makes use of several optics: `list_` is a `Traversal` working
+on the individual values in a list, `addressL` is a `Lens`
+auto-generated for data type `Employee`, `eqBy` is an `Optional`, and
+`stateL` is another `Lens`. Sequencing these via `(.>)` yield a `Traversal`,
+which is the converted to a `Setter` when being passed to `set`.
 
 ## Design Decisions
 

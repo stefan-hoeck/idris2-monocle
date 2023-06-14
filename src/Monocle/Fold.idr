@@ -36,11 +36,31 @@ public export %inline
 ToFold Fold where toFold = id
 
 --------------------------------------------------------------------------------
+--          Monoids
+--------------------------------------------------------------------------------
+
+public export
+[SFirst] Semigroup (Maybe a) where
+  Nothing <+> y = y
+  x       <+> _ = x
+
+public export
+[First] Monoid (Maybe a) using SFirst where neutral = Nothing
+
+public export
+[SLast] Semigroup (Maybe a) where
+  x <+> Nothing = x
+  _ <+> y       = y
+
+public export
+[Last] Monoid (Maybe a) using SLast where neutral = Nothing
+
+--------------------------------------------------------------------------------
 --          Utility Functions
 --------------------------------------------------------------------------------
 
 public export %inline
-foldMap : ToFold o => Monoid m => o s t a b -> (a -> m) -> s -> m
+foldMap : Monoid m => ToFold o => o s t a b -> (a -> m) -> s -> m
 foldMap f = foldMap_ (toFold f)
 
 public export %inline
@@ -48,21 +68,21 @@ fold : ToFold o => Monoid a => o s t a b -> s -> a
 fold f = foldMap f id
 
 public export %inline
-list : ToFold o => o s t a b -> s -> List a
-list f = foldMap f pure
+asList : ToFold o => o s t a b -> s -> List a
+asList f = foldMap f pure
 
 public export %inline
-snocList : ToFold o => o s t a b -> s -> SnocList a
-snocList f = foldMap f pure
+asSnocList : ToFold o => o s t a b -> s -> SnocList a
+asSnocList f = foldMap f pure
 
-public export
+public export %inline
 first : ToFold o => o s t a b -> s -> Maybe a
-first f v = case list f v of (h::_) => Just h; Nil => Nothing
+first f = foldMap @{First} f Just
 
 public export
 last : ToFold o => o s t a b -> s -> Maybe a
-last f v = case snocList f v of (_ :< l) => Just l; Lin => Nothing
+last f = foldMap @{Last} f Just
 
 public export
 find : ToFold o => o s t a b -> (a -> Bool) -> s -> Maybe a
-find f g v = find g (list f v)
+find f g = foldMap @{First} f (\x => if g x then Just x else Nothing)

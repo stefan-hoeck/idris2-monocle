@@ -20,6 +20,12 @@ public export
 optional : (s -> Maybe a) -> (a -> s -> s) -> Optional' s a
 optional f g = O (\v => maybe (Left v) Right (f v)) g
 
+public export
+mapA : Applicative f => Optional s t a b -> (a -> f b) -> s -> f t
+mapA (O g r) f v = case g v of
+  Left x  => pure x
+  Right x => map (`r` v) (f x)
+
 --------------------------------------------------------------------------------
 --          Interface
 --------------------------------------------------------------------------------
@@ -45,9 +51,7 @@ ToFold Optional where
 
 public export
 ToTraversal Optional where
-  toTraversal (O g r) = T $ \f,v => case g v of
-    Left x  => pure x
-    Right x => map (`r` v) (f x)
+  toTraversal o = T (mapA o) (toFold o) (toSetter o)
 
 --------------------------------------------------------------------------------
 --          Utilities
