@@ -77,12 +77,12 @@ ToOptional Lens where
   toOptional l = O (Right . l.get_) (setL l)
 
 public export %inline
-ToTraversal Lens where
-  toTraversal l = T (modF l)
-
-public export %inline
 ToSetter Lens where
   toSetter = S . mod_
+
+public export %inline
+ToTraversal Lens where
+  toTraversal l = T (modF l) (toFold l) (toSetter l)
 
 --------------------------------------------------------------------------------
 --          Lenses

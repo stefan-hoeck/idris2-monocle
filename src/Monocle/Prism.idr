@@ -22,6 +22,12 @@ public export
 prism : (a -> Maybe b) -> (b -> a) -> Prism' a b
 prism f = P (\v => maybe (Left v) Right (f v))
 
+public export
+mapA : Applicative f => Prism s t a b -> (a -> f b) -> s -> f t
+mapA (P g r) f v = case g v of
+  Left x  => pure x
+  Right x => map r (f x)
+
 --------------------------------------------------------------------------------
 --          Interface
 --------------------------------------------------------------------------------
@@ -51,9 +57,7 @@ ToFold Prism where
 
 public export
 ToTraversal Prism where
-  toTraversal (P g r) = T $ \f,v => case g v of
-    Left x  => pure x
-    Right x => r <$> f x
+  toTraversal o = T (mapA o) (toFold o) (toSetter o)
 
 --------------------------------------------------------------------------------
 --          Utilities

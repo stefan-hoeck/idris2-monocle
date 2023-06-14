@@ -59,7 +59,7 @@ ToGetter Iso where
 
 public export
 ToTraversal Iso where
-  toTraversal (I g r) = T $ \f,v => r <$> f (g v)
+  toTraversal i = T (\f,v => i.reverseGet <$> f (i.get_ v)) (toFold i) (toSetter i)
 
 public export %inline
 ToLens Iso where

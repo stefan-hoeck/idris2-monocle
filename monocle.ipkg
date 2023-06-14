@@ -1,7 +1,7 @@
 package monocle
 version    = 0.0.1
 authors    = "stefan-hoeck"
-brief      = "A simple optics library"
+brief      = "A simple library of derivable optics"
 depends    = base    >= 0.6.0
            , elab-util
            , quantifiers-extra

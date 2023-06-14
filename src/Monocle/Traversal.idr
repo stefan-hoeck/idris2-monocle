@@ -2,6 +2,8 @@ module Monocle.Traversal
 
 import Control.Applicative.Const
 import Control.Monad.Identity
+import Data.List1
+import Data.Vect
 import Monocle.Fold
 import Monocle.Setter
 
@@ -11,6 +13,8 @@ public export
 record Traversal s t a b where
   constructor T
   modifyA : {0 f : _} -> Applicative f => (a -> f b) -> s -> f t
+  fold_   : Fold s t a b
+  set_    : Setter s t a b
 
 public export
 0 Traversal' : (s,a : Type) -> Type
@@ -32,12 +36,11 @@ ToTraversal Traversal where toTraversal = id
 --------------------------------------------------------------------------------
 
 public export %inline
-ToFold Traversal where
-  toFold t = F $ \f => runConst . t.modifyA (MkConst . f)
+ToFold Traversal where toFold = fold_
 
 public export %inline
 ToSetter Traversal where
-  toSetter t = S $ \f => runIdentity . t.modifyA (Id . f)
+  toSetter = set_
 
 --------------------------------------------------------------------------------
 --          Utilities
@@ -45,7 +48,7 @@ ToSetter Traversal where
 
 public export %inline
 (|>) : Traversal s t a b -> Traversal a b c d -> Traversal s t c d
-T f |> T g = T $ f . g
+T t1 f1 s1 |> T t2 f2 s2 = T (t1 . t2) (f1 |> f2) (s1 |> s2)
 
 --------------------------------------------------------------------------------
 --          Predefined Traversals
@@ -53,8 +56,20 @@ T f |> T g = T $ f . g
 
 public export %inline
 traverse_ : Traversable f => Traversal (f a) (f b) a b
-traverse_ = T traverse
+traverse_ = T traverse (F foldMap) (S map)
 
 public export %inline
-chars : Traversal' String Char
-chars = T $ \f => map pack . traverse f . unpack
+list_ : Traversal (List a) (List b) a b
+list_ = traverse_
+
+public export %inline
+snoclist_ : Traversal (List a) (List b) a b
+snoclist_ = traverse_
+
+public export %inline
+list1_ : Traversal (List1 a) (List1 b) a b
+list1_ = traverse_
+
+public export %inline
+vect_ : Traversal (Vect n a) (Vect n b) a b
+vect_ = traverse_

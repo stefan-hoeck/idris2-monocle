@@ -76,11 +76,12 @@ increaseNumber : Address
 increaseNumber = over numberL (+2) address
 ```
 
-As you can see, we can access and update the values in a record
+As you can see, we can access (function `to`) and
+update (functions `set` and `over`) the values in a record
 via the corresponding lenses.
 
 There are two issues with what we have seen so far: First, defining
-lenses seems to be pretty cumbersome and boring, and second, the
+lenses seems to be pretty cumbersome and boring, and second, they
 don't seem to add anything new: All of this can be achieved with
 record syntax in Idris.
 
@@ -89,7 +90,7 @@ library provides elaborator scripts to derive the lenses of a record
 for us.
 
 About the second issue: The power of lenses and other optics comes
-from the ability to compose them to create new optics that focus
+from the ability to sequence them to create new optics that focus
 on data deep with a nested data structure. Let's introduce a
 second record type with a field of type `Address`:
 
@@ -127,7 +128,7 @@ johnFixed :  Employee
 johnFixed = over (addressL .> stateL) toUpper john
 ```
 
-As you can see, lenses can be composed via the `(>>>)` operator.
+As you can see, lenses can be composed via the `(.>)` operator.
 However, this is still an example that could easily be solved with
 record syntax. We will leave it at that for the time being, but
 we will later see, that there are lenses and other optics that
@@ -135,7 +136,7 @@ are outside the scope and capabilities of record syntax.
 
 ## Iso: Isomorphisms
 
-The second optic we are going to look at is `Iso`, a abbreviation
+The second optic we are going to look at is `Iso`, an abbreviation
 for *isomorphism*. Isomorphisms connect types that can be converted
 in both directions without loss of information. One example is
 the isomorphism between `String` and `List Char` (`Control.Iso.unpack`).
@@ -152,10 +153,10 @@ lastToUpper : String -> String
 lastToUpper = over (unpack .> fish) lastUp
 ```
 
-Again, this is nothing spectacular, as we could to the same
+Again, this is nothing spectacular, as we could do the same
 thing just with function composition. However, lenses and isomorphisms
-can be combined (every `Iso` can be converted to a lens with the
-`L` utility function). This allows us to use `lastUp` to modify
+can be combined (every `Iso` can be converted to a lens via interface
+`ToLens`). This allows us to use `lastUp` to modify
 the nested records we defined in the first section:
 
 ```idris
@@ -163,28 +164,32 @@ zuericH : Employee
 zuericH = over (addressL .> cityL .> unpack .> fish) lastUp john
 ```
 
+The example above shows an important concept: Operator `(.>)` is overloaded,
+and allows us to sequence different types of optics. The type of the resulting
+optic is computed automatically.
+
 Isomorphisms arise naturally from lossless conversions, for
 instance, when we define newtype wrappers:
-
-```idris
-record Age where
-  constructor MkAge
-  value : Nat
-
-%runElab derive "Age" [Show,Eq,FromInteger,FromJSON,ToJSON]
-
-ageI : Iso' Age Nat
-ageI = I value MkAge
-```
-
-Again, we can derive these simple isomorphisms automatically:
 
 ```idris
 record UserName where
   constructor MkUserName
   value : String
 
-%runElab derive "UserName" [Iso,Show,Eq,FromString,FromJSON,ToJSON]
+%runElab derive "UserName" [Show,Eq,FromString,FromJSON,ToJSON]
+
+userNameI : Iso' Intro.UserName String
+userNameI = I value MkUserName
+```
+
+Again, we can derive these simple isomorphisms automatically:
+
+```idris
+record Age where
+  constructor MkAge
+  value : Nat
+
+%runElab derive "Age" [Iso,Show,Eq,FromInteger,FromJSON,ToJSON]
 ```
 
 And here's how to make use of them in combination with record updates:
@@ -223,10 +228,12 @@ thirdLetter = first (supervisorL .> just .> nameL .> unpack .> ix 2)
 
 `Fold`s are the most basic way of accessing data, and fortunately, all
 optics with the exception of `Setter`s can be converted to `Fold`s
-via the overloaded `F` utilities. In the example above we see a
-combination of lenses `supervisorL` and `nameL`, isomorphism `unpack`.
+via the `ToFold` interface. In the example above we see a
+combination of lenses `supervisorL` and `nameL`, and isomorphism `unpack`.
 There are two additional optics, which I'll introduce below: `just` is
-a `Prism` and `index 2` is an `Optional`.
+a `Prism` and `index 2` is an `Optional`. The sequencing of these results
+in an `Optional`, which will then be converted to a `Fold` in the
+call to `first`.
 
 While a `Fold` allows us to try and extract a number of values,
 a `Setter` allows us to modify such values via a pure function.
@@ -239,7 +246,7 @@ thirdBang = set (supervisorL .> just .> nameL .> unpack .> ix 2) '!'
 ```
 
 All optics with the exception of `Fold`s and `Getter`s can be converted
-to `Setter`s via the overloaded `S` utilities.
+to `Setter`s via interface `ToSetter`.
 
 ## Prisms: Views on Sum Types
 
@@ -255,7 +262,8 @@ to extract a wrapped value and an injection function which
 wraps a value in the correct data constructor.
 
 Besides sum types, there are many situations where a `Prism` is
-appropriate. For instance:
+appropriate. For instance, we can define a prism from `String`
+to JSON-encoded values:
 
 ```idris
 json : FromJSON a => ToJSON a => Prism' JSON a
@@ -302,18 +310,18 @@ salary of all whose age is above 40. Here's how to do that:
 
 ```idris
 increased : List Employee
-increased = over (map_ .> select ((> 40) . age) .> salaryL) (+100) [helen,john]
+increased = over (list_ .> select ((> 40) . age) .> salaryL) (+100) [helen,john]
 ```
 
 In the example above, Helen's salary will be increased while John's won't.
-Setter `map_` operates on all values in a functor, while `filter` defines
+Traversal `list_` operates on the values in a list, while `select` defines
 an `Optional` that only returns or updates a value if it fulfills the
 given predicate.
 
 `Optional`s are slightly less powerful than `Prism`s (every `Prism`
-can be converted to an `Optional` by means of the `O` utility function).
+can be converted to an `Optional` by means of the `ToOptional` interface).
 
-Note: The `filter` `Optional` we used above is somewhat controversial, as
+Note: The `select` `Optional` we used above is somewhat controversial, as
 it allows us to define non-lawful optics. I'll cover this topic in
 a later section, but suffice to say that we should not filter on
 a piece of information we plan to modify with the same optic. In the
@@ -321,7 +329,10 @@ example above, we are fine: We filter on age but we modify the salary.
 
 ## Traversal: An Optic for effectful Traversals
 
-To be done....
+The last optic we are going to look at is the `Traversal`. It is highly
+useful when working with container types potentially holding many values.
+We already saw an example in function `increased`, where we used the
+`list_` traversal.
 
 <!-- vi: filetype=idris2:syntax=markdown
 -->
