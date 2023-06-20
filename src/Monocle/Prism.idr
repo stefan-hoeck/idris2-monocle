@@ -45,7 +45,7 @@ ToPrism Prism where toPrism = id
 
 public export
 ToOptional Prism where
-  toOptional (P g r) = O g (const . r)
+  toOptional (P g r) = O g (\f => either id (r . f) . g)
 
 public export
 ToSetter Prism where
