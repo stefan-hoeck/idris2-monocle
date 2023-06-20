@@ -1,5 +1,6 @@
 module Monocle.Optional
 
+import Data.List
 import Monocle.Fold
 import Monocle.Setter
 import Monocle.Traversal
@@ -10,21 +11,21 @@ public export
 record Optional s t a b where
   constructor O
   getOrModify : s -> Either t a
-  replace     : b -> s -> t
+  replace     : (a -> b) -> s -> t
 
 public export
 0 Optional' : (s,a : Type) -> Type
 Optional' s a = Optional s s a a
 
 public export
-optional : (s -> Maybe a) -> (a -> s -> s) -> Optional' s a
+optional : (s -> Maybe a) -> ((a -> a) -> s -> s) -> Optional' s a
 optional f g = O (\v => maybe (Left v) Right (f v)) g
 
 public export
 mapA : Applicative f => Optional s t a b -> (a -> f b) -> s -> f t
 mapA (O g r) f v = case g v of
   Left x  => pure x
-  Right x => map (`r` v) (f x)
+  Right x => map (\vb => r (const vb) v) (f x)
 
 --------------------------------------------------------------------------------
 --          Interface
@@ -41,9 +42,9 @@ ToOptional Optional where toOptional = id
 --          Conversions
 --------------------------------------------------------------------------------
 
-public export
+public export %inline
 ToSetter Optional where
-  toSetter (O g r) = S $ \f,vs => either id (\va => r (f va) vs) (g vs)
+  toSetter (O g r) = S r
 
 public export
 ToFold Optional where
@@ -60,8 +61,8 @@ ToTraversal Optional where
 public export
 (|>) : Optional s t a b -> Optional a b c d -> Optional s t c d
 O g1 r1 |> O g2 r2 =
-  O (\v => g1 v >>= mapFst (`r1` v) . g2)
-    (\vd,vs => either id (\va => r1 (r2 vd va) vs) (g1 vs))
+  O (\v => g1 v >>= mapFst (\vb => r1 (const vb) v) . g2)
+    (r1 . r2)
 
 --------------------------------------------------------------------------------
 --          Predefined Optionals
@@ -74,22 +75,36 @@ getIx (S k) (_::t) = getIx k t
 getIx _     Nil    = Nothing
 
 public export
-setIx : Nat -> a -> List a -> List a
-setIx 0     x (h::xs) = x :: xs
-setIx (S k) x (h::xs) = h :: setIx k x xs
-setIx _     _ []      = []
+modIx : Nat -> (a -> a) -> List a -> List a
+modIx 0     f (h::xs) = f h :: xs
+modIx (S k) f (h::xs) = h :: modIx k f xs
+modIx _     _ []      = []
 
 public export
 ix : Nat -> Optional' (List a) a
-ix n = optional (getIx n) (setIx n)
+ix n = optional (getIx n) (modIx n)
 
 public export
 select : (a -> Bool) -> Optional' a a
 select p =
   optional
     (\v => if p v then Just v else Nothing)
-    (\n,o => if p o then n else o)
+    (\f,o => if p o then f o else o)
 
-public export
+public export %inline
 eqBy : Eq b => b -> (a -> b) -> Optional' a a
 eqBy v f = select ((v ==) . f)
+
+public export
+modWhere : SnocList a -> (a -> Bool) -> (a -> a) -> List a -> List a
+modWhere sa f g []        = sa <>> []
+modWhere sa f g (x :: xs) =
+  if f x then sa <>> (g x :: xs) else modWhere (sa :< x) f g xs
+
+public export %inline
+first : (a -> Bool) -> Optional' (List a) a
+first f = optional (find f) (modWhere [<] f)
+
+public export %inline
+eqFirst : Eq b => b -> (a -> b) -> Optional' (List a) a
+eqFirst v f = first ((v ==) . f)

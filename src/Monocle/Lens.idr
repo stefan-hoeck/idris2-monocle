@@ -74,7 +74,7 @@ ToFold Lens where
 
 public export
 ToOptional Lens where
-  toOptional l = O (Right . l.get_) (setL l)
+  toOptional l = O (Right . l.get_) l.mod_
 
 public export %inline
 ToSetter Lens where

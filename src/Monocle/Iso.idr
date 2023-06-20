@@ -43,7 +43,7 @@ ToPrism Iso where
 
 public export
 ToOptional Iso where
-  toOptional (I g r) = O (Right . g) (const . r)
+  toOptional (I g r) = O (Right . g) (\f => r . f . g)
 
 public export
 ToSetter Iso where
