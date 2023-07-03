@@ -200,3 +200,7 @@ OSeq Fold Traversal Fold where seq x y = x |> toFold y
 
 public export %inline
 OSeq Fold Getter Fold where seq x y = x |> toFold y
+
+export
+atO : Eq k => k -> Optional' (List (k,v)) v
+atO key = eqFirst key fst .> snd
