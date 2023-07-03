@@ -82,6 +82,14 @@ I f1 g1 |> I f2 g2 = I (f2 . f1) (g1 . g2)
 --------------------------------------------------------------------------------
 
 export
+identity : Iso' a a
+identity = I id id
+
+export %inline
+idL : Lens' a a
+idL = toLens identity
+
+export
 pack : Iso' (List Char) String
 pack = I pack unpack
 
