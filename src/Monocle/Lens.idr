@@ -116,6 +116,14 @@ public export
 at : Ord k => k -> Lens' (SortedMap k v) (Maybe v)
 at x = lens (lookup x) $ \mv,m => maybe (delete x m) (\v => insert x v m) mv
 
+export
+atDflt : Ord k => k -> v -> Lens' (SortedMap k v) v
+atDflt x v = lens (fromMaybe v . lookup x) (insert x)
+
+export %inline
+atAuto : Ord k => k -> {auto prf : v} -> Lens' (SortedMap k v) v
+atAuto x = atDflt x prf
+
 public export
 allGet :
      {0 ks : List k}
