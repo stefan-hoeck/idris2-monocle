@@ -12,9 +12,9 @@ import Monocle.Setter
 public export
 record Traversal s t a b where
   constructor T
-  modifyA : {0 f : _} -> Applicative f => (a -> f b) -> s -> f t
-  fold_   : Fold s t a b
-  set_    : Setter s t a b
+  modifyA_ : {0 f : _} -> Applicative f => (a -> f b) -> s -> f t
+  fold_    : Fold s t a b
+  set_     : Setter s t a b
 
 public export
 0 Traversal' : (s,a : Type) -> Type
@@ -49,6 +49,10 @@ ToSetter Traversal where
 public export %inline
 (|>) : Traversal s t a b -> Traversal a b c d -> Traversal s t c d
 T t1 f1 s1 |> T t2 f2 s2 = T (t1 . t2) (f1 |> f2) (s1 |> s2)
+
+export
+modifyA : ToTraversal l => Applicative f => l s t a b -> (a -> f b) -> (s -> f t)
+modifyA lns fun = modifyA_ (toTraversal lns) fun
 
 --------------------------------------------------------------------------------
 --          Predefined Traversals
