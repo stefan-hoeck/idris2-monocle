@@ -69,6 +69,10 @@ O g1 r1 |> O g2 r2 =
 --------------------------------------------------------------------------------
 
 public export
+emptyO : Optional' s a
+emptyO = O Left (const id)
+
+public export
 getIx : Nat -> List a -> Maybe a
 getIx 0     (h::_) = Just h
 getIx (S k) (_::t) = getIx k t
