@@ -302,6 +302,52 @@ encodedEmployee = """
 Go ahead, and give this a try at the REPL: `incEncodedAge encodedEmployee` will
 increase the encoded employee's age and return a new string with the JSON data.
 
+In the example above, we go via a proper Idris type, which we can encode to
+and decode from JSON. It is also possible to achieve the same result by using
+derived prisms for the `JSON` sum type:
+
+```idris
+%runElab derive "JSON" [Prisms]
+```
+
+The elaborator script above generates prisms of the same name as the data
+constructors of `JSON` (but starting with a lower-case letter), such
+as `jNull` or `jString`.
+
+```idris
+key : String -> Optional' (List (String,a)) a
+key s = first ((s ==) . fst) .> snd
+
+inc : Num a => a -> a
+inc = (+1)
+
+incEncodedAge2 : String -> String
+incEncodedAge2 = over (parseJSON .> jObject .> key "age" .> jInteger) inc
+```
+
+Let's have a look at these: `key` allows us to focus on a specific
+key-value pair in a list of pairs. Here, we make use of
+`Monocle.Optional.first`, for focussing on the first value in a list
+that fulfills a given predicate. In order to only look at the second
+value of the resulting pair, we use `Monocle.Lens.snd`.
+
+By combining this with several prisms, we can conveniently parse and
+update the JSON string.
+
+At first, we found that `Getter`s and `Fold`s can often be replaced with
+simple (pure) functions, but in the current example, even this gets tedious.
+With optics, however, we can use the same optics for updating and
+extracting values. In the example above, we could move the
+`Optional` to the top-level and use it for updating and accessing data:
+
+```idris
+ageO : Optional' String Nat
+ageO = parseJSON .> jObject .> key "age" .> jInteger .> nat
+```
+
+We can now extract the age of an encoded employee like so:
+`first ageO encodedEmployee`.
+
 ## Optional: A View on Things that might not be there
 
 There are only a few views left for us to cover, but this one is also highly
