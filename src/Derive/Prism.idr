@@ -19,13 +19,13 @@ parameters (o : LensOptions)
   pdef0 con =
     let nme := pname con
         get := `(\case ~(var con) => Just (); _ => Nothing)
-     in def nme [patClause (var nme) `(lens ~(get) (const ~(var con)))]
+     in def nme [patClause (var nme) `(prism ~(get) (const ~(var con)))]
 
   pdef1 : Name -> Decl
   pdef1 con =
     let nme := pname con
         get := `(\case ~(var con) x => Just x; _ => Nothing)
-     in def nme [patClause (var nme) `(lens ~(get) ~(var con))]
+     in def nme [patClause (var nme) `(prism ~(get) ~(var con))]
 
   ptl : Visibility -> ParamTypeInfo -> Con n vs -> Maybe TopLevel
   ptl vis p (MkCon con _ args _) = case boundArgs regular args [] of
