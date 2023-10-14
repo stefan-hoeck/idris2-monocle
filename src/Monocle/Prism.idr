@@ -5,6 +5,7 @@ import Monocle.Optional
 import Monocle.Setter
 import Monocle.Traversal
 import Data.List.Quantifiers.Extra
+import Data.Maybe
 
 %default total
 
@@ -125,3 +126,7 @@ sum :
   -> {auto e : Elem t ks}
   -> Prism' (Any f ks) (f t)
 sum t = prism project' inject
+
+public export
+nat : Prism' Integer Nat
+nat = prism (\x => toMaybe (x >= 0) (cast x)) cast
