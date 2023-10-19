@@ -12,7 +12,7 @@ import Data.Maybe
 
 %default total
 
-||| An `Iso` describes an isomorphism between two types.
+||| An Iso describes an isomorphism between two types.
 |||
 ||| Two types are isomorphic, if there is a lossless conversion
 ||| from one to the other and vice versa. Examples include the
@@ -23,13 +23,16 @@ import Data.Maybe
 |||
 ||| `get_ . reverseGet` must be the identity function. The same holds
 ||| for `reverseGet . get_`.
+|||
+||| Isomorphisms are the most powerful kinds of optics, and they can
+||| be converted to all other optics in this library.
 public export
 record Iso s t a b where
   constructor I
   get_       : s -> a
   reverseGet : b -> t
 
-||| Convenience alias for monomorphic `Iso`s, which do not allow
+||| Convenience alias for monomorphic Isos, which do not allow
 ||| us to change the value and source types.
 public export
 0 Iso' : (s,a : Type) -> Type
@@ -39,7 +42,7 @@ Iso' s a = Iso s s a a
 --          Interface
 --------------------------------------------------------------------------------
 
-||| Interface for converting other optics to `Iso`s.
+||| Interface for converting other optics to Isos.
 public export
 interface ToIso (0 o : Type -> Type -> Type -> Type -> Type) where
   toIso : o s t a b -> Iso s t a b
@@ -92,7 +95,7 @@ public export %inline
 rev : Iso s t a b -> Iso b a t s
 rev (I f g) = I g f
 
-||| Sequential composition of `Iso`s.
+||| Sequential composition of Isos.
 |||
 ||| This describes the transitivity of isomorphisms: If `x` is isomorphic to
 ||| `y` and `y` is isomorhic to `z`, then `x` is isomorphic to `z`.
