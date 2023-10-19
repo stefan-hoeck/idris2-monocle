@@ -11,6 +11,11 @@ import Monocle.Traversal
 
 %default total
 
+||| Interface for the sequencing of different types of optics.
+|||
+||| The kind of optic we get as a result is determined by the kinds of optics
+||| we sequence. For instance, sequencing a Lens with a Prism results in
+||| an Optional, while sequencing with an Iso does preserve an optic's type.
 public export
 interface OSeq (0 k,l,m : Type -> Type -> Type -> Type -> Type) | k,l where
   seq : k s t a b -> l a b c d -> m s t c d
