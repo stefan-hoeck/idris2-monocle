@@ -128,6 +128,11 @@ public export
 tail : Lens' (Vect (S n) a) (Vect n a)
 tail = lens tail $ \x,v => head v :: x
 
+||| A Lens focussing on a specific element in a vector.
+public export
+ix : Fin n -> Lens' (Vect n a) a
+ix x = L (index x) (updateAt x)
+
 ||| A Lens focussing on the head of a non-empty list.
 public export
 head1 : Lens' (List1 a) a
