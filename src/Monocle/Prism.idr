@@ -193,6 +193,14 @@ sum :
   -> Prism' (Any f ks) (f t)
 sum t = prism project' inject
 
+public export
+anyHead : Prism' (Any f (k::ks)) (f k)
+anyHead = prism (\case Here v => Just v; _ => Nothing) Here
+
+public export
+anyTail : Prism' (Any f (k::ks)) (Any f ks)
+anyTail = prism (\case There v => Just v; _ => Nothing) There
+
 ||| A Prism focussing on non-negative integers.
 public export
 nat : Prism' Integer Nat

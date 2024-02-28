@@ -195,3 +195,12 @@ prod :
   -> {auto e : Elem t ks}
   -> Lens' (All f ks) (f t)
 prod t = L allGet allUpd
+
+public export
+allHead : Lens' (All f (k::ks)) (f k)
+allHead = lens (\(v::_) => v) (\v,(_::vs) => v::vs)
+
+public export
+allTail : Lens' (All f (k::ks)) (All f ks)
+allTail = lens (\(_::vs) => vs) (\vs,(v::_) => v::vs)
+-- allTail = prism (\case There v => Just v; _ => Nothing) There
