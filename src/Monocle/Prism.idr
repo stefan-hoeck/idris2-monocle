@@ -5,6 +5,7 @@ import Monocle.Optional
 import Monocle.Setter
 import Monocle.Traversal
 import Data.List.Quantifiers.Extra
+import Data.List1
 import Data.Maybe
 
 %default total
@@ -182,6 +183,15 @@ lin = prism (\case Lin => Just (); _ => Nothing) (const Lin)
 public export %inline
 snoc : Prism' (SnocList a) (SnocList a,a)
 snoc = snoc'
+
+||| A Prism for converting between non-empty lists and regular lists.
+public export
+list1' : Prism (List a) (List b) (List1 a) (List1 b)
+list1' = P (\case Nil => Left Nil; h::t => Right (h ::: t)) forget
+
+public export %inline
+list1 : Prism' (List a) (List1 a)
+list1 = list1'
 
 ||| A Prism focussing on a single option in a heterogeneous sum.
 public export
