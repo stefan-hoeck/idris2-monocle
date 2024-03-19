@@ -1,5 +1,6 @@
 module Monocle.Getter
 
+import Control.Monad.State
 import Monocle.Fold
 
 %default total
@@ -45,3 +46,12 @@ to = to_ . toGetter
 public export %inline
 ToFold Getter where
   toFold f = F (. to_ f)
+
+--------------------------------------------------------------------------------
+--          State
+--------------------------------------------------------------------------------
+
+||| View the current state through a `Getter`
+export %inline
+getST : Monad m => Getter s t a b -> StateT s m a
+getST g = g.to_ <$> get
