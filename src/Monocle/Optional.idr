@@ -1,5 +1,6 @@
 module Monocle.Optional
 
+import Control.Monad.State
 import Data.List
 import Monocle.Fold
 import Monocle.Setter
@@ -147,3 +148,16 @@ first f = optional (find f) (modWhere [<] f)
 public export %inline
 eqFirst : Eq b => b -> (a -> b) -> Optional' (List a) a
 eqFirst v f = first ((v ==) . f)
+
+--------------------------------------------------------------------------------
+--          State
+--------------------------------------------------------------------------------
+
+||| View a stateful computation resulting in a monoid through an
+||| optional.
+export
+stO : Applicative m => Monoid x => Optional' t s -> StateT s m x -> StateT t m x
+stO o (ST f) =
+  ST $ \v => case first o v of
+    Nothing  => pure (v, neutral)
+    Just vs  => (\(vs2,w) => (set o vs2 v, w)) <$> f vs

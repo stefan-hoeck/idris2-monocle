@@ -5,6 +5,7 @@ import Monocle.Getter
 import Monocle.Optional
 import Monocle.Setter
 import Monocle.Traversal
+import Control.Monad.State
 import Data.List.Quantifiers.Extra
 import Data.List1
 import Data.Maybe
@@ -203,4 +204,22 @@ allHead = lens (\(v::_) => v) (\v,(_::vs) => v::vs)
 public export
 allTail : Lens' (All f (k::ks)) (All f ks)
 allTail = lens (\(_::vs) => vs) (\vs,(v::_) => v::vs)
--- allTail = prism (\case There v => Just v; _ => Nothing) There
+
+--------------------------------------------------------------------------------
+--          State
+--------------------------------------------------------------------------------
+
+||| View a state through a lens
+export
+stL : Functor m => Lens' t s -> StateT s m x -> StateT t m x
+stL l (ST f) = ST $ \v => (\(w,r) => (setL l w v, r)) <$> f (l.get_ v)
+
+-- ||| View a stateful computation resulting in a monoid through an
+-- ||| optional.
+-- export
+-- stateO : Monoid x => Optional' t s -> State s x -> State t x
+-- stateO o (ST f) =
+--   ST $ \v => case first o v of
+--     Nothing  => Id (v, neutral)
+--     Just vs  => let Id (vs2,w) := f vs in Id (set o vs2 v, w)
+--

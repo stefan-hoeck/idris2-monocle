@@ -1,8 +1,9 @@
 module Monocle.Setter
 
-import Monocle.Fold
+import Control.Monad.State
 import Data.Contravariant
 import Data.SnocList
+import Monocle.Fold
 
 %default total
 
@@ -76,3 +77,17 @@ map_ = S map
 public export %inline
 contramap_ : Contravariant f => Setter (f a) (f b) b a
 contramap_ = S contramap
+
+--------------------------------------------------------------------------------
+--          State
+--------------------------------------------------------------------------------
+
+||| Modify the current state with a setter
+export %inline
+overST : Monad m => Setter' s a -> (a -> a) -> StateT s m ()
+overST s f = modify (s.over_ f)
+
+||| Modify the current state with a setter
+export %inline
+setST : Monad m => Setter' s a -> a -> StateT s m ()
+setST s = overST s . const
