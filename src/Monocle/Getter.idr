@@ -53,5 +53,9 @@ ToFold Getter where
 
 ||| View the current state through a `Getter`
 export %inline
-getST : Monad m => Getter s t a b -> StateT s m a
-getST g = g.to_ <$> get
+getST : Monad m => ToGetter o => o s t a b -> StateT s m a
+getST g = to g <$> get
+
+export %inline
+withST : Monad m => ToGetter o => o s s a a -> (a -> StateT s m t) -> StateT s m t
+withST g f = getST g >>= f
