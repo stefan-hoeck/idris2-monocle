@@ -20,7 +20,7 @@ public export
 interface OSeq (0 k,l,m : Type -> Type -> Type -> Type -> Type) | k,l where
   seq : k s t a b -> l a b c d -> m s t c d
 
-infixl 9 .>
+export infixl 9 .>
 
 public export %inline
 (.>) : {0 k,l,m : _} -> k s t a b -> l a b c d -> OSeq k l m => m s t c d
