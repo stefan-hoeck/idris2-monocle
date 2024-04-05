@@ -14,7 +14,7 @@ import Data.Vect
 
 %default total
 
-infixl 9 |>
+export infixl 9 |>
 
 --------------------------------------------------------------------------------
 --          Lens
