@@ -5,7 +5,7 @@ import Data.SnocList
 
 %default total
 
-infixl 9 |>
+export infixl 9 |>
 
 ||| A Fold is a composable data accessor, allowing us to extract
 ||| zero or more values of type `a` from a value of type `s`.
