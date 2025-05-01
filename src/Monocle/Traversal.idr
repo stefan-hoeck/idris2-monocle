@@ -3,6 +3,7 @@ module Monocle.Traversal
 import Control.Applicative.Const
 import Control.Monad.Identity
 import Data.List1
+import Data.SnocList
 import Data.Vect
 import Monocle.Fold
 import Monocle.Setter
@@ -79,7 +80,7 @@ list_ = traverse_
 
 ||| `traverse_` specialized to snoclists.
 public export %inline
-snoclist_ : Traversal (List a) (List b) a b
+snoclist_ : Traversal (SnocList a) (SnocList b) a b
 snoclist_ = traverse_
 
 ||| `traverse_` specialized to non-empty lists.
