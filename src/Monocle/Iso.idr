@@ -117,6 +117,21 @@ export %inline
 idL : Lens' a a
 idL = toLens identity
 
+||| The identity prism, derived from the corresponding isomorphism.
+export %inline
+idP : Prism' a a
+idP = toPrism identity
+
+||| The identity optional, derived from the corresponding isomorphism.
+export %inline
+idO : Optional' a a
+idO = toOptional identity
+
+||| The identity traversal, derived from the corresponding isomorphism.
+export %inline
+idT : Traversal' a a
+idT = toTraversal identity
+
 ||| Isomorphism between `List Char` and `String`.
 export
 pack : Iso' (List Char) String
