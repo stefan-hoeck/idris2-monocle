@@ -242,7 +242,10 @@ given letter with another one:
 
 ```idris
 thirdBang : Employee -> Employee
-thirdBang = set (supervisorL .> just .> nameL .> unpack .> ix 2) '!'
+thirdBang = set opt '!'
+  where
+    opt : Optional' Employee Char
+    opt = supervisorL .> just {a = Employee} .> nameL .> unpack .> Optional.ix 2
 ```
 
 All optics with the exception of `Fold`s and `Getter`s can be converted
@@ -322,7 +325,10 @@ inc : Num a => a -> a
 inc = (+1)
 
 incEncodedAge2 : String -> String
-incEncodedAge2 = over (parseJSON .> jObject .> key "age" .> jInteger) inc
+incEncodedAge2 = over opt inc
+  where
+    opt : Optional' String Integer
+    opt = parseJSON .> jObject .> key "age" .> jInteger
 ```
 
 Let's have a look at these: `key` allows us to focus on a specific
