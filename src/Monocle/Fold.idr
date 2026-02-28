@@ -6,12 +6,13 @@ import Data.SnocList
 %default total
 
 export
-infixl 0 :>
+infixl 0 ~>
+
 ||| A Fold is a composable data accessor, allowing us to extract
 ||| zero or more values of type `a` from a value of type `s`.
 |||
 ||| Like other optics, `Folds` can be composed sequentially via operator
-||| `(:>)`.
+||| `(~>)`.
 |||
 ||| This is a type constructor parameterized over four type parameters
 ||| of which two (`t` and `b`) are phantom types without any runtime
@@ -37,8 +38,8 @@ empty = F $ \_,_ => neutral
 
 ||| Sequential composition of Folds.
 public export %inline
-(:>) : Fold s t a b -> Fold a b c d -> Fold s t c d
-F f :> F g = F $ f . g
+(~>) : Fold s t a b -> Fold a b c d -> Fold s t c d
+F f ~> F g = F $ f . g
 
 --------------------------------------------------------------------------------
 --          Interface

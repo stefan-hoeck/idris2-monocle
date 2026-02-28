@@ -81,8 +81,8 @@ ToTraversal Optional where
 
 ||| Sequential composition of Optionals.
 public export
-(:>) : Optional s t a b -> Optional a b c d -> Optional s t c d
-O g1 r1 :> O g2 r2 =
+(~>) : Optional s t a b -> Optional a b c d -> Optional s t c d
+O g1 r1 ~> O g2 r2 =
   O (\v => g1 v >>= mapFst (\vb => r1 (const vb) v) . g2)
     (r1 . r2)
 

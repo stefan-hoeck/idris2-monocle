@@ -91,8 +91,8 @@ ToTraversal Prism where
 
 ||| Sequential composition of Prisms.
 public export
-(:>) : Prism s t a b -> Prism a b c d -> Prism s t c d
-P g1 r1 :> P g2 r2 =
+(~>) : Prism s t a b -> Prism a b c d -> Prism s t c d
+P g1 r1 ~> P g2 r2 =
   P (\v => g1 v >>= mapFst r1 . g2)
     (r1 . r2)
 

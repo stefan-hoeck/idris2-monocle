@@ -20,8 +20,8 @@ record Getter (s,t,a,b : Type) where
 
 ||| Sequential composition of Getters.
 public export %inline
-(:>) : Getter s t a b -> Getter a b c d -> Getter s t c d
-G f :> G g = G $ g . f
+(~>) : Getter s t a b -> Getter a b c d -> Getter s t c d
+G f ~> G g = G $ g . f
 --------------------------------------------------------------------------------
 --          Interface
 --------------------------------------------------------------------------------
