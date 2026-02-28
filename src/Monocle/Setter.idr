@@ -60,8 +60,8 @@ set f = over (toSetter f) . const
 
 ||| Sequential composition of setters.
 public export %inline
-(|>) : Setter s t a b -> Setter a b c d -> Setter s t c d
-S f |> S g = S $ f . g
+(:>) : Setter s t a b -> Setter a b c d -> Setter s t c d
+S f :> S g = S $ f . g
 
 --------------------------------------------------------------------------------
 --          Predefined Setters
