@@ -76,8 +76,8 @@ modF l g v = (\x => setL l x v) <$> g (get_ l v)
 
 ||| Sequential composition of lenses.
 public export
-(|>) : Lens s t x y -> Lens x y a b -> Lens s t a b
-L g1 s1 |> L g2 s2 = L (g2 . g1) (s1 . s2)
+(~>) : Lens s t x y -> Lens x y a b -> Lens s t a b
+L g1 s1 ~> L g2 s2 = L (g2 . g1) (s1 . s2)
 
 --------------------------------------------------------------------------------
 --          Conversions

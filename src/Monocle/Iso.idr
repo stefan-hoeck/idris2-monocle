@@ -100,8 +100,8 @@ rev (I f g) = I g f
 ||| This describes the transitivity of isomorphisms: If `x` is isomorphic to
 ||| `y` and `y` is isomorhic to `z`, then `x` is isomorphic to `z`.
 public export
-(|>) : Iso s t a b -> Iso a b c d -> Iso s t c d
-I f1 g1 |> I f2 g2 = I (f2 . f1) (g1 . g2)
+(~>) : Iso s t a b -> Iso a b c d -> Iso s t c d
+I f1 g1 ~> I f2 g2 = I (f2 . f1) (g1 . g2)
 
 --------------------------------------------------------------------------------
 --          Isomorphisms

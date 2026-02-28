@@ -56,8 +56,8 @@ ToSetter Traversal where
 --------------------------------------------------------------------------------
 
 public export %inline
-(|>) : Traversal s t a b -> Traversal a b c d -> Traversal s t c d
-T t1 f1 s1 |> T t2 f2 s2 = T (t1 . t2) (f1 |> f2) (s1 |> s2)
+(~>) : Traversal s t a b -> Traversal a b c d -> Traversal s t c d
+T t1 f1 s1 ~> T t2 f2 s2 = T (t1 . t2) (f1 ~> f2) (s1 ~> s2)
 
 ||| Adjust the focus of a Traversal with an effectful computation.
 export
